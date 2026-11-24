@@ -1,4 +1,5 @@
 const $ = id => document.getElementById(id);
+const publishedPreview = document.body.hasAttribute("data-pages-preview");
 const defaultTemplate = {
   id: "approval",
   name: "품의서",
@@ -178,9 +179,10 @@ function renderControls() {
 
   const hasBody = draft.values.some(value => value.trim());
   for (const id of ["save-document", "copy", "print"]) $(id).disabled = generating || !title;
-  for (const id of ["new-document", "saved-new-document", "template", "subject", "reason", "sample", "generate"]) {
+  for (const id of ["new-document", "saved-new-document", "template", "subject", "reason", "sample"]) {
     $(id).disabled = generating;
   }
+  $("generate").disabled = generating || publishedPreview;
   for (const input of $("paper-fields").querySelectorAll("textarea")) input.disabled = generating;
   $("generate").setAttribute("aria-busy", String(generating));
   $("generate").lastElementChild.textContent = generating ? "초안 작성 중…" : hasBody ? "AI 초안 다시 작성" : "AI 초안 작성";
@@ -255,7 +257,7 @@ async function selectTemplate(template) {
 
 async function generateDraft(event) {
   event.preventDefault();
-  if (generating) return;
+  if (generating || publishedPreview) return;
   const title = draft.title.trim();
   const reason = draft.reason.trim();
   if (!title || !reason) {
