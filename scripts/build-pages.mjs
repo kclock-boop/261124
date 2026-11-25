@@ -5,6 +5,7 @@ const [destination, basePath = "/261124/", access] = process.argv.slice(2);
 if (!destination || !/^\/(?:[\w.-]+\/)*$/.test(basePath) || (access && access !== "--private-site")) {
   throw new Error("Usage: node scripts/build-pages.mjs <destination> [basePath] [--private-site]");
 }
+const privateSite = access === "--private-site";
 
 const targets = new Map([
   ["portal.html", "index.html"],
@@ -12,10 +13,12 @@ const targets = new Map([
   ...[
     "portal.css", "portal.js", "desk-data.js", "desk.css", "desk.js",
     "modules/desk.html", "modules/safety.html", "modules/moyang.html",
-    "modules/review.html", "modules/folder.html", "tool-v2.css", "review.js", "folder.js",
+    "modules/folder.html", "tool-v2.css", "folder.js",
     "styles.css", "app.js", "sw.js", "manifest.webmanifest", "favicon.svg",
     "icon-192.png", "icon-512.png"
-  ].map(name => [name, name])
+  ].map(name => [name, name]),
+  ...(privateSite ? ["modules/review.html", "review.js"] : ["modules/desk-participant.html", "modules/safety-participant.html"])
+    .map(name => [name, name])
 ]);
 
 const routes = new Map([
@@ -27,9 +30,15 @@ const routes = new Map([
 function publicContent(source, text) {
   if (source === "portal.html") {
     text = text.replace(/^[ \t]*<a class="reference"[^\r\n]*\r?\n/m, "");
+    if (!privateSite) text = text.replace(/^[ \t]*<a [^\r\n]*data-private-tool[^\r\n]*\r?\n/gm, "");
   }
-  if (source === "modules/review.html" && access !== "--private-site") {
-    text = text.replace(/^[ \t]*<a [^\r\n]*data-shared-source[^\r\n]*\r?\n/m, "");
+  if (!privateSite && source === "portal.js") {
+    text = text.replace(/^[ \t]*review:[^\r\n]*\r?\n/m, "")
+      .replace(/(  desk: \["업무 데스크", )"https:[^"]+"/, '$1"/modules/desk-participant.html"')
+      .replace(/(  safety: \["현장안전포털", )"https:[^"]+"/, '$1"/modules/safety-participant.html"');
+  }
+  if (!privateSite && source === "modules/folder.html") {
+    text = text.replace(/^[ \t]*<a [^\r\n]*data-original-folder-link[^\r\n]*\r?\n/m, "");
   }
   if (source === "index.html") {
     text = text.replace("<body>", '<body data-pages-preview>')
@@ -37,10 +46,12 @@ function publicContent(source, text) {
       .replace(/(<p class="privacy">[^\r\n]*?<span>)[^<]*/, "$1공개 화면에서는 문서를 직접 작성하고 저장할 수 있습니다. AI 초안 작성은 로컬 실행에서 사용할 수 있습니다.");
   }
   if (source === "sw.js") {
-    text = text.replace("taehwa-document-workspace-", "taehwa-pages-" + basePath + "-");
+    const shell = ["/", ...[...targets.values()].filter(name => name !== "sw.js").map(name => "/" + name)];
+    text = text.replace("taehwa-document-workspace-", "taehwa-pages-" + basePath + "-")
+      .replace(/const shell = \[[\s\S]*?\];/, "const shell = " + JSON.stringify(shell, null, 2) + ";");
   }
   const sharedLink = /chatgpt\.com\/s\//i.test(text);
-  const allowSourceLink = source === "modules/review.html" && access === "--private-site";
+  const allowSourceLink = source === "modules/review.html" && privateSite;
   if ((sharedLink && !allowSourceLink) || /-----BEGIN [A-Z ]*PRIVATE KEY-----|\bsk-[A-Za-z0-9_-]{20,}/i.test(text)) {
     throw new Error("Private link or credential pattern in " + source);
   }
