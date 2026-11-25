@@ -2,10 +2,9 @@ import { currentOccurrence, localDay, read, readDesk, todayTasks } from "/261124
 
 const screens = {
   home: ["업무 홈"],
-  review: ["AI 경진대회 자료 사전검토", "/261124/modules/review.html"],
   folder: ["공유폴더 대시보드", "/261124/modules/folder.html"],
-  desk: ["업무 데스크", "https://workdesk-report-demo.grandswan2048.chatgpt.site/", "desk-local"],
-  safety: ["현장안전포털", "https://htmlpreview.github.io/?https://raw.githubusercontent.com/otk4406/safety/main/index.html", "safety-local"],
+  desk: ["업무 데스크", "/261124/modules/desk-participant.html", "desk-local"],
+  safety: ["현장안전포털", "/261124/modules/safety-participant.html", "safety-local"],
   "desk-local": ["내 업무 데스크", "/261124/modules/desk.html"],
   "safety-local": ["내 현장점검 기록", "/261124/modules/safety.html"],
   documents: ["품의서 작성", "/261124/documents.html"],
