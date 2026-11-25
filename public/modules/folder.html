@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>공유폴더 대시보드</title><link rel="stylesheet" href="/desk.css"><link rel="stylesheet" href="/tool-v2.css"><script type="module" src="/folder.js"></script></head>
+<body><main>
+  <header><div><h1>공유폴더 대시보드</h1><p>송춘빈 · 폴더 현황 보기</p></div>
+    <a class="module-button" href="https://tleotleo0949.github.io/261125/" target="_blank" rel="noopener noreferrer">제공된 원본 주소</a>
+  </header>
+  <article class="folder-panel">
+    <h2>내 PC의 폴더 확인</h2>
+    <p class="helper">폴더를 선택하면 파일 이름, 크기, 수정일을 표시합니다. 파일 목록은 현재 화면에서만 처리합니다.</p>
+    <label class="field">폴더 선택<input type="file" id="folder-picker" webkitdirectory multiple></label>
+    <p id="folder-summary" class="progress-label" aria-live="polite">폴더를 선택해 주세요.</p>
+    <div class="folder-controls" id="folder-controls" hidden>
+      <label class="field">파일명 검색<input id="folder-search" type="search" placeholder="파일명 또는 폴더명"></label>
+      <label class="field">정렬<select id="folder-sort"><option value="recent">최근 수정순</option><option value="name">이름순</option><option value="size">용량순</option></select></label>
+    </div>
+    <div class="folder-table" id="folder-table" hidden><table><thead><tr><th scope="col">파일 경로</th><th scope="col">크기</th><th scope="col">수정일</th></tr></thead><tbody id="folder-rows"></tbody></table></div>
+    <div id="folder-pages" class="tool-actions" hidden><button type="button" id="folder-prev">이전</button><span id="folder-page"></span><button type="button" id="folder-next">다음</button></div>
+  </article>
+</main></body>
+</html>

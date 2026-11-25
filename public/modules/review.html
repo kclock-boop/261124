@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI 경진대회 자료 사전검토</title><link rel="stylesheet" href="/desk.css"><link rel="stylesheet" href="/tool-v2.css"><script type="module" src="/review.js"></script></head>
+<body><main>
+  <header><div><h1>AI 경진대회 자료 사전검토</h1><p>양영석 · AI 경진대회 자료 사전검토 도구 v1.0.0</p></div>
+  </header>
+  <section class="tool-grid">
+    <article>
+      <h2>실습용 점검표</h2>
+      <p class="helper">제출 전 확인한 항목에 표시하세요. 점검표와 메모는 이 브라우저에 저장됩니다.</p>
+      <label class="field">과제명<input id="review-title" type="text" maxlength="100" placeholder="예: 현장점검 보고서 자동화"></label>
+      <ul class="checklist" id="criteria"></ul>
+    </article>
+    <article>
+      <h2>검토 결과</h2>
+      <p class="progress-label" id="progress-label" aria-live="polite"></p>
+      <progress id="review-progress" value="0" max="6" aria-label="검토 완료 항목"></progress>
+      <label class="field">보완 메모<textarea id="review-notes" rows="6" maxlength="3000"></textarea></label>
+      <div class="tool-actions"><button type="button" id="copy-review">결과 복사</button><button type="button" id="download-review">텍스트 저장</button></div>
+      <p class="helper" id="review-message" role="status"></p>
+    </article>
+  </section>
+</main></body>
+</html>

@@ -7,7 +7,9 @@ import { defaultUrl, serviceName, startServer } from "../server/index.mjs";
 async function running() {
   try {
     const response = await fetch(defaultUrl + "/api/health", { signal: AbortSignal.timeout(750) });
-    return response.ok && (await response.json()).service === serviceName;
+    if (!response.ok) return false;
+    const health = await response.json();
+    return health.service === serviceName && health.edition === 2;
   } catch {
     return false;
   }

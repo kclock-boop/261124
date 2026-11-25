@@ -1,9 +1,9 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-const [destination, basePath = "/261124/"] = process.argv.slice(2);
-if (!destination || !/^\/(?:[\w.-]+\/)+$/.test(basePath)) {
-  throw new Error("Usage: node scripts/build-pages.mjs <destination> [/repository/]");
+const [destination, basePath = "/261124/", access] = process.argv.slice(2);
+if (!destination || !/^\/(?:[\w.-]+\/)*$/.test(basePath) || (access && access !== "--private-site")) {
+  throw new Error("Usage: node scripts/build-pages.mjs <destination> [basePath] [--private-site]");
 }
 
 const targets = new Map([
@@ -12,6 +12,7 @@ const targets = new Map([
   ...[
     "portal.css", "portal.js", "desk-data.js", "desk.css", "desk.js",
     "modules/desk.html", "modules/safety.html", "modules/moyang.html",
+    "modules/review.html", "modules/folder.html", "tool-v2.css", "review.js", "folder.js",
     "styles.css", "app.js", "sw.js", "manifest.webmanifest", "favicon.svg",
     "icon-192.png", "icon-512.png"
   ].map(name => [name, name])
@@ -27,6 +28,9 @@ function publicContent(source, text) {
   if (source === "portal.html") {
     text = text.replace(/^[ \t]*<a class="reference"[^\r\n]*\r?\n/m, "");
   }
+  if (source === "modules/review.html" && access !== "--private-site") {
+    text = text.replace(/^[ \t]*<a [^\r\n]*data-shared-source[^\r\n]*\r?\n/m, "");
+  }
   if (source === "index.html") {
     text = text.replace("<body>", '<body data-pages-preview>')
       .replace('id="generate"', 'id="generate" disabled')
@@ -35,7 +39,9 @@ function publicContent(source, text) {
   if (source === "sw.js") {
     text = text.replace("taehwa-document-workspace-", "taehwa-pages-" + basePath + "-");
   }
-  if (/chatgpt\.com\/s\/|-----BEGIN [A-Z ]*PRIVATE KEY-----|\bsk-[A-Za-z0-9_-]{20,}/i.test(text)) {
+  const sharedLink = /chatgpt\.com\/s\//i.test(text);
+  const allowSourceLink = source === "modules/review.html" && access === "--private-site";
+  if ((sharedLink && !allowSourceLink) || /-----BEGIN [A-Z ]*PRIVATE KEY-----|\bsk-[A-Za-z0-9_-]{20,}/i.test(text)) {
     throw new Error("Private link or credential pattern in " + source);
   }
   return text.replace(/"(\/[^"\r\n]*)"/g, (quoted, path) =>

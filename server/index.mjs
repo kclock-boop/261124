@@ -12,6 +12,11 @@ const assets = new Map([
   ["/desk-data.js", ["desk-data.js", "text/javascript; charset=utf-8"]],
   ["/desk.js", ["desk.js", "text/javascript; charset=utf-8"]],
   ["/desk.css", ["desk.css", "text/css; charset=utf-8"]],
+  ["/tool-v2.css", ["tool-v2.css", "text/css; charset=utf-8"]],
+  ["/review.js", ["review.js", "text/javascript; charset=utf-8"]],
+  ["/folder.js", ["folder.js", "text/javascript; charset=utf-8"]],
+  ["/modules/review.html", ["modules/review.html", "text/html; charset=utf-8"]],
+  ["/modules/folder.html", ["modules/folder.html", "text/html; charset=utf-8"]],
   ["/modules/desk.html", ["modules/desk.html", "text/html; charset=utf-8"]],
   ["/modules/safety.html", ["modules/safety.html", "text/html; charset=utf-8", true]],
   ["/modules/moyang.html", ["modules/moyang.html", "text/html; charset=utf-8", true]],
@@ -36,6 +41,8 @@ const headers = {
 };
 const modulePolicy = headers["content-security-policy"] +
   "; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:";
+const portalPolicy = headers["content-security-policy"] +
+  "; frame-src 'self' https://workdesk-report-demo.grandswan2048.chatgpt.site https://htmlpreview.github.io";
 
 function sendJson(response, status, data) {
   response.writeHead(status, { ...headers, "Content-Type": "application/json; charset=utf-8" });
@@ -59,7 +66,7 @@ export async function startServer(port = Number(new URL(defaultUrl).port)) {
         return;
       }
       if (url.pathname === "/api/health" && req.method === "GET") {
-        sendJson(res, 200, { service: serviceName });
+        sendJson(res, 200, { service: serviceName, edition: 2 });
         return;
       }
       if (url.pathname === "/api/generate") {
@@ -92,7 +99,8 @@ export async function startServer(port = Number(new URL(defaultUrl).port)) {
       const content = await readFile(new URL("../public/" + filename, import.meta.url));
       res.writeHead(200, {
         ...headers, "Content-Type": contentType,
-        "content-security-policy": originalModule ? modulePolicy : headers["content-security-policy"]
+        "content-security-policy": filename === "portal.html"
+          ? portalPolicy : originalModule ? modulePolicy : headers["content-security-policy"]
       });
       res.end(req.method === "HEAD" ? undefined : content);
     } catch {
