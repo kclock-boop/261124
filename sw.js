@@ -1,5 +1,5 @@
 const cachePrefix = "taehwa-pages-/261124/-";
-const cacheName = cachePrefix + "v4";
+const cacheName = cachePrefix + "v5";
 const shell = [
   "/261124/",
   "/261124/index.html",
@@ -8,6 +8,11 @@ const shell = [
   "/261124/desk-data.js",
   "/261124/desk.js",
   "/261124/desk.css",
+  "/261124/tool-v2.css",
+  "/261124/review.js",
+  "/261124/folder.js",
+  "/261124/modules/review.html",
+  "/261124/modules/folder.html",
   "/261124/modules/desk.html",
   "/261124/modules/safety.html",
   "/261124/modules/moyang.html",

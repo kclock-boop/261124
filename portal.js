@@ -2,8 +2,12 @@ import { currentOccurrence, localDay, read, readDesk, todayTasks } from "/261124
 
 const screens = {
   home: ["업무 홈"],
-  desk: ["업무 데스크", "/261124/modules/desk.html"],
-  safety: ["현장 안전점검", "/261124/modules/safety.html"],
+  review: ["AI 경진대회 자료 사전검토", "/261124/modules/review.html"],
+  folder: ["공유폴더 대시보드", "/261124/modules/folder.html"],
+  desk: ["업무 데스크", "https://workdesk-report-demo.grandswan2048.chatgpt.site/", "desk-local"],
+  safety: ["현장안전포털", "https://htmlpreview.github.io/?https://raw.githubusercontent.com/otk4406/safety/main/index.html", "safety-local"],
+  "desk-local": ["내 업무 데스크", "/261124/modules/desk.html"],
+  "safety-local": ["내 현장점검 기록", "/261124/modules/safety.html"],
   documents: ["품의서 작성", "/261124/documents.html"],
   studio: ["이모티콘 제작기", "/261124/modules/moyang.html"]
 };
@@ -30,21 +34,43 @@ function refreshSummary() {
 function navigate() {
   const target = location.hash.slice(1);
   const key = Object.hasOwn(screens, target) ? target : "home";
-  const [label, route] = screens[key];
+  const [label, route, localScreen] = screens[key];
   $("screen-name").textContent = label;
   $("home").hidden = Boolean(route);
   $("tools").hidden = !route;
   for (const item of document.querySelectorAll("[data-screen]")) {
-    if (item.dataset.screen === key) item.setAttribute("aria-current", "page");
+    if (item.dataset.screen === key.replace(/-local$/, "")) item.setAttribute("aria-current", "page");
     else item.removeAttribute("aria-current");
   }
   if (route && !frames.has(key)) {
+    const panel = document.createElement("div");
     const frame = document.createElement("iframe");
     frame.src = route;
     frame.title = label;
-    frame.allow = "clipboard-write 'self'";
-    $("tools").append(frame);
-    frames.set(key, frame);
+    if (localScreen) {
+      panel.className = "source-panel";
+      const toolbar = document.createElement("div");
+      toolbar.className = "source-toolbar";
+      const caption = document.createElement("span");
+      caption.textContent = "참여생 원본";
+      const original = document.createElement("a");
+      original.href = route;
+      original.target = "_blank";
+      original.rel = "noopener noreferrer";
+      original.textContent = "원본 새 창에서 열기";
+      const local = document.createElement("a");
+      local.href = "#" + localScreen;
+      local.textContent = "내 기존 기록 열기";
+      toolbar.append(caption, original, local);
+      panel.append(toolbar);
+      frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-downloads allow-modals");
+      frame.referrerPolicy = "no-referrer";
+    } else {
+      frame.allow = "clipboard-write 'self'";
+    }
+    panel.append(frame);
+    $("tools").append(panel);
+    frames.set(key, panel);
   }
   for (const [id, frame] of frames) frame.hidden = id !== key;
   refreshSummary();
@@ -88,6 +114,18 @@ $("dismiss-reminder").addEventListener("click", () => {
   showReminder();
 });
 window.addEventListener("hashchange", navigate);
+let installPrompt;
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  installPrompt = event;
+  $("install-platform").hidden = false;
+});
+$("install-platform").addEventListener("click", async () => {
+  const prompt = installPrompt;
+  installPrompt = undefined;
+  $("install-platform").hidden = true;
+  if (prompt) await prompt.prompt();
+});
 window.addEventListener("storage", refreshSummary);
 document.addEventListener("visibilitychange", checkReminders);
 setInterval(() => { refreshSummary(); checkReminders(); }, 15000);
