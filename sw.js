@@ -1,5 +1,5 @@
 const cachePrefix = "taehwa-pages-/261124/-";
-const cacheName = cachePrefix + "v8";
+const cacheName = cachePrefix + "v9";
 const shell = [
   "/261124/",
   "/261124/index.html",
@@ -21,6 +21,7 @@ const shell = [
   "/261124/favicon.svg",
   "/261124/icon-192.png",
   "/261124/icon-512.png",
+  "/261124/taehwa-logo.png",
   "/261124/modules/desk-participant.html",
   "/261124/modules/safety-participant.html"
 ];
