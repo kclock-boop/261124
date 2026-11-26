@@ -9,10 +9,65 @@ const screens = {
   "desk-local": ["내 업무 데스크", "/modules/desk.html"],
   "safety-local": ["내 현장점검 기록", "/modules/safety.html"],
   documents: ["품의서 작성", "/documents"],
-  studio: ["이모티콘 제작기", "/modules/moyang.html"]
+  studio: ["이모티콘 제작기", "/modules/moyang.html"],
+  "tools-guide": ["도구 안내"]
 };
 const $ = id => document.getElementById(id);
 const frames = new Map();
+const toolCards = [...$("tool-grid").querySelectorAll("[data-screen]")];
+const jump = $("quick-jump");
+const dateFormat = new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium" });
+
+for (const card of toolCards) {
+  const key = card.dataset.screen;
+  jump.add(new Option(card.querySelector("strong").textContent, key));
+}
+
+function filterTools() {
+  const query = $("tool-query").value.trim().normalize("NFKC").toLocaleLowerCase("ko-KR");
+  const compact = value => value.replace(/\s+/g, "");
+  const matches = toolCards.filter(card => {
+    const keywords = (card.textContent + " " + card.dataset.search).normalize("NFKC").toLocaleLowerCase("ko-KR");
+    const match = !query || compact(keywords).includes(compact(query)) ||
+      query.split(/\s+/).every(word => keywords.includes(word));
+    card.hidden = !match;
+    return match;
+  });
+  $("tools-guide").hidden = Boolean(query);
+  $("search-message").hidden = !query;
+  $("search-message").textContent = query ? "검색 결과 " + matches.length + "개" : "";
+  $("no-tools").hidden = matches.length !== 0;
+  return matches;
+}
+
+function clearSearch() {
+  $("tool-query").value = "";
+  filterTools();
+}
+
+function renderRecentDocuments(records) {
+  const latest = records
+    .filter(record => typeof record?.draft?.title === "string" && record.draft.title.trim())
+    .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
+    .slice(0, 4);
+  const items = latest.map(record => {
+    const row = document.createElement("li");
+    const title = document.createElement("strong");
+    title.textContent = record.draft.title;
+    row.append(title);
+    const date = new Date(record.updatedAt);
+    if (Number.isFinite(+date)) {
+      const time = document.createElement("time");
+      time.dateTime = date.toISOString();
+      time.textContent = dateFormat.format(date);
+      row.append(time);
+    }
+    return row;
+  });
+  $("recent-documents").replaceChildren(...items);
+  $("recent-documents").hidden = items.length === 0;
+  $("recent-empty").hidden = items.length > 0;
+}
 
 function refreshSummary() {
   const date = new Date();
@@ -27,19 +82,22 @@ function refreshSummary() {
   $("safety-count").textContent = Array.isArray(safety)
     ? safety.filter(row => ["open", "progress"].includes(row?.status)).length : 0;
   $("document-count").textContent = Array.isArray(documents) ? documents.length : 0;
+  renderRecentDocuments(Array.isArray(documents) ? documents : []);
   $("today").dateTime = localDay(date);
   $("today").textContent = new Intl.DateTimeFormat("ko-KR", { dateStyle: "full" }).format(date);
 }
 
-function navigate() {
+function navigate(event) {
   const target = location.hash.slice(1);
   const key = Object.hasOwn(screens, target) ? target : "home";
   const [label, route, localScreen] = screens[key];
   $("screen-name").textContent = label;
   $("home").hidden = Boolean(route);
+  $("screen-bar").hidden = !route;
   $("tools").hidden = !route;
-  for (const item of document.querySelectorAll("[data-screen]")) {
-    if (item.dataset.screen === key.replace(/-local$/, "")) item.setAttribute("aria-current", "page");
+  jump.value = key;
+  for (const item of toolCards) {
+    if (item.dataset.screen === key) item.setAttribute("aria-current", "page");
     else item.removeAttribute("aria-current");
   }
   if (route && !frames.has(key)) {
@@ -73,6 +131,13 @@ function navigate() {
     frames.set(key, panel);
   }
   for (const [id, frame] of frames) frame.hidden = id !== key;
+  if (key === "tools-guide") {
+    clearSearch();
+    requestAnimationFrame(() => $("tools-guide").scrollIntoView({ block: "start" }));
+  } else if (event && route) {
+    window.scrollTo(0, 0);
+    $("screen-name").focus({ preventScroll: true });
+  }
   refreshSummary();
 }
 
@@ -114,6 +179,25 @@ $("dismiss-reminder").addEventListener("click", () => {
   showReminder();
 });
 window.addEventListener("hashchange", navigate);
+$("tool-query").addEventListener("input", () => {
+  if ($("home").hidden && $("tool-query").value.trim()) location.hash = "home";
+  filterTools();
+});
+$("tool-search").addEventListener("submit", event => {
+  event.preventDefault();
+  const matches = filterTools();
+  if ($("tool-query").value.trim() && matches.length === 1) {
+    location.hash = matches[0].hash;
+  } else {
+    if ($("home").hidden) location.hash = "home";
+    requestAnimationFrame(() => $("tools-heading").scrollIntoView({ block: "nearest" }));
+  }
+});
+jump.addEventListener("change", () => {
+  if (jump.value === "home") clearSearch();
+  location.hash = jump.value;
+});
+for (const homeLink of document.querySelectorAll('a[href="#home"]')) homeLink.addEventListener("click", clearSearch);
 let installPrompt;
 window.addEventListener("beforeinstallprompt", event => {
   event.preventDefault();

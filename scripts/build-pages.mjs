@@ -30,7 +30,9 @@ const routes = new Map([
 function publicContent(source, text) {
   if (source === "portal.html") {
     text = text.replace(/^[ \t]*<a class="reference"[^\r\n]*\r?\n/m, "");
-    if (!privateSite) text = text.replace(/^[ \t]*<a [^\r\n]*data-private-tool[^\r\n]*\r?\n/gm, "");
+    if (!privateSite) {
+      text = text.replace(/^[ \t]*<a\b[^>]*\bdata-private-tool\b[^>]*>[\s\S]*?<\/a>[ \t]*(?:\r?\n|$)/gm, "");
+    }
   }
   if (!privateSite && source === "portal.js") {
     text = text.replace(/^[ \t]*review:[^\r\n]*\r?\n/m, "")
