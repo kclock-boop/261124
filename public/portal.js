@@ -1,7 +1,7 @@
 import { currentOccurrence, localDay, read, readDesk, todayTasks } from "/desk-data.js";
 
 const screens = {
-  home: ["업무 홈"],
+  home: ["종합 홈"],
   review: ["AI 경진대회 자료 사전검토", "/modules/review.html"],
   folder: ["공유폴더 대시보드", "/modules/folder.html"],
   desk: ["업무 데스크", "https://workdesk-report-demo.grandswan2048.chatgpt.site/", "desk-local"],
@@ -10,11 +10,13 @@ const screens = {
   "safety-local": ["내 현장점검 기록", "/modules/safety.html"],
   documents: ["품의서 작성", "/documents"],
   studio: ["이모티콘 제작기", "/modules/moyang.html"],
-  "tools-guide": ["도구 안내"]
+  "tools-guide": ["업무 지원 도구"]
 };
 const $ = id => document.getElementById(id);
 const frames = new Map();
-const toolCards = [...$("tool-grid").querySelectorAll("[data-screen]")];
+const participantCards = [...$("tool-grid").querySelectorAll("[data-screen]")];
+const utilityCards = [...$("utility-grid").querySelectorAll("[data-screen]")];
+const toolCards = [...participantCards, ...utilityCards];
 const jump = $("quick-jump");
 const dateFormat = new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium" });
 
@@ -22,6 +24,7 @@ for (const card of toolCards) {
   const key = card.dataset.screen;
   jump.add(new Option(card.querySelector("strong").textContent, key));
 }
+jump.add(new Option(screens["tools-guide"][0], "tools-guide"));
 
 function filterTools() {
   const query = $("tool-query").value.trim().normalize("NFKC").toLocaleLowerCase("ko-KR");
@@ -33,9 +36,12 @@ function filterTools() {
     card.hidden = !match;
     return match;
   });
-  $("tools-guide").hidden = Boolean(query);
+  $("tools-heading").textContent = query ? "검색 결과" : "참여자 프로그램";
+  $("home").classList.toggle("is-searching", Boolean(query));
+  $("tool-grid").hidden = participantCards.every(card => card.hidden);
+  $("tools-guide").hidden = utilityCards.every(card => card.hidden);
   $("search-message").hidden = !query;
-  $("search-message").textContent = query ? "검색 결과 " + matches.length + "개" : "";
+  $("search-message").textContent = query ? matches.length + "개" : "";
   $("no-tools").hidden = matches.length !== 0;
   return matches;
 }
