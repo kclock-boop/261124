@@ -100,6 +100,7 @@ function navigate(event) {
   const [label, route, localScreen] = screens[key];
   $("screen-name").textContent = label;
   intro.hidden = Boolean(route);
+  syncIntroPlayback();
   programs.hidden = Boolean(route);
   $("screen-bar").hidden = !route;
   $("tools").hidden = !route;
@@ -211,16 +212,42 @@ jump.addEventListener("change", () => {
 });
 for (const homeLink of document.querySelectorAll('a[href="#programs"]')) homeLink.addEventListener("click", clearSearch);
 const motionButton = $("motion-toggle");
+const introVideo = $("intro-video");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-function syncIntroMotion() {
-  intro.classList.toggle("is-animated", !reduceMotion.matches);
-  motionButton.hidden = reduceMotion.matches;
+let motionPaused = reduceMotion.matches;
+
+function syncIntroPlayback() {
+  if (intro.hidden || motionPaused) {
+    introVideo.pause();
+    return;
+  }
+  if (!introVideo.hasAttribute("src")) introVideo.src = introVideo.dataset.src;
+  introVideo.play().catch(() => {});
 }
-motionButton.addEventListener("click", () => {
-  const paused = intro.classList.toggle("is-paused");
-  motionButton.textContent = paused ? "움직임 재생" : "움직임 멈추기";
+
+function updateMotionButton() {
+  motionButton.textContent = introVideo.paused ? "영상 재생" : "영상 멈추기";
+}
+
+introVideo.addEventListener("play", () => {
+  motionButton.hidden = false;
+  updateMotionButton();
 });
-reduceMotion.addEventListener("change", syncIntroMotion);
+introVideo.addEventListener("pause", updateMotionButton);
+introVideo.addEventListener("error", () => {
+  motionButton.hidden = true;
+  introVideo.removeAttribute("src");
+  introVideo.load();
+});
+motionButton.addEventListener("click", () => {
+  motionPaused = !introVideo.paused;
+  syncIntroPlayback();
+});
+reduceMotion.addEventListener("change", event => {
+  motionPaused = event.matches;
+  syncIntroPlayback();
+});
+motionButton.hidden = false;
 syncIntroMotion();
 let installPrompt;
 window.addEventListener("beforeinstallprompt", event => {

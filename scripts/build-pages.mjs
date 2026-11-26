@@ -15,7 +15,7 @@ const targets = new Map([
     "modules/desk.html", "modules/safety.html", "modules/moyang.html",
     "modules/folder.html", "tool-v2.css", "folder.js",
     "styles.css", "app.js", "sw.js", "manifest.webmanifest", "favicon.svg",
-    "icon-192.png", "icon-512.png", "harbor-intro.jpg"
+    "icon-192.png", "icon-512.png", "harbor-intro.jpg", "harbor-loop.mp4"
   ].map(name => [name, name]),
   ...(privateSite ? ["modules/review.html", "review.js"] : ["modules/desk-participant.html", "modules/safety-participant.html"])
     .map(name => [name, name])
@@ -48,7 +48,7 @@ function publicContent(source, text) {
       .replace(/(<p class="privacy">[^\r\n]*?<span>)[^<]*/, "$1공개 화면에서는 문서를 직접 작성하고 저장할 수 있습니다. AI 초안 작성은 로컬 실행에서 사용할 수 있습니다.");
   }
   if (source === "sw.js") {
-    const shell = ["/", ...[...targets.values()].filter(name => name !== "sw.js").map(name => "/" + name)];
+    const shell = ["/", ...[...targets.values()].filter(name => name !== "sw.js" && !name.endsWith(".mp4")).map(name => "/" + name)];
     text = text.replace("taehwa-document-workspace-", "taehwa-pages-" + basePath + "-")
       .replace(/const shell = \[[\s\S]*?\];/, "const shell = " + JSON.stringify(shell, null, 2) + ";");
   }
@@ -64,7 +64,7 @@ function publicContent(source, text) {
 const output = resolve(destination);
 for (const [source, target] of targets) {
   const input = new URL("../public/" + source, import.meta.url);
-  const content = /\.(?:png|jpg)$/.test(source) ? await readFile(input) : publicContent(source, await readFile(input, "utf8"));
+  const content = /\.(?:png|jpg|mp4)$/.test(source) ? await readFile(input) : publicContent(source, await readFile(input, "utf8"));
   const file = resolve(output, target);
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, content);

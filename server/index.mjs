@@ -1,5 +1,6 @@
+import { createReadStream } from "node:fs";
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { once } from "node:events";
 import { Readable } from "node:stream";
 import generate from "./generate.mjs";
@@ -25,6 +26,7 @@ const assets = new Map([
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
   ["/favicon.svg", ["favicon.svg", "image/svg+xml"]],
   ["/harbor-intro.jpg", ["harbor-intro.jpg", "image/jpeg"]],
+  ["/harbor-loop.mp4", ["harbor-loop.mp4", "video/mp4"]],
   ["/manifest.webmanifest", ["manifest.webmanifest", "application/manifest+json; charset=utf-8"]],
   ["/sw.js", ["sw.js", "text/javascript; charset=utf-8"]],
   ["/icon-192.png", ["icon-192.png", "image/png"]],
@@ -48,6 +50,36 @@ const portalPolicy = headers["content-security-policy"] +
 function sendJson(response, status, data) {
   response.writeHead(status, { ...headers, "Content-Type": "application/json; charset=utf-8" });
   response.end(JSON.stringify(data));
+}
+
+async function serveVideo(req, res, file, contentType) {
+  const { size } = await stat(file);
+  const videoHeaders = { ...headers, "Content-Type": contentType, "Accept-Ranges": "bytes" };
+  const range = req.method === "GET" && /^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
+  const partial = Boolean(range && (range[1] || range[2]));
+  let start = 0;
+  let end = size - 1;
+  if (partial && range[1]) {
+    start = Number(range[1]);
+    if (range[2]) end = Math.min(end, Number(range[2]));
+  } else if (partial) {
+    start = Math.max(0, size - Number(range[2]));
+  }
+  if (start > end) {
+    res.writeHead(416, { ...videoHeaders, "Content-Range": "bytes */" + size }).end();
+    return;
+  }
+  if (partial) videoHeaders["Content-Range"] = "bytes " + start + "-" + end + "/" + size;
+  videoHeaders["Content-Length"] = end - start + 1;
+  res.writeHead(partial ? 206 : 200, videoHeaders);
+  if (req.method === "HEAD") {
+    res.end();
+    return;
+  }
+  const stream = createReadStream(file, { start, end });
+  stream.on("error", error => res.destroy(error));
+  res.on("close", () => stream.destroy());
+  stream.pipe(res);
 }
 
 export async function startServer(port = Number(new URL(defaultUrl).port)) {
@@ -97,7 +129,12 @@ export async function startServer(port = Number(new URL(defaultUrl).port)) {
         return;
       }
       const [filename, contentType, originalModule] = asset;
-      const content = await readFile(new URL("../public/" + filename, import.meta.url));
+      const file = new URL("../public/" + filename, import.meta.url);
+      if (contentType === "video/mp4") {
+        await serveVideo(req, res, file, contentType);
+        return;
+      }
+      const content = await readFile(file);
       res.writeHead(200, {
         ...headers, "Content-Type": contentType,
         "content-security-policy": filename === "portal.html"
