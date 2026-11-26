@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eef3f8">
+  <title>태화기업 업무자동화 3차</title>
+  <link rel="icon" href="/261124/v3/favicon.svg">
+  <link rel="manifest" href="/261124/v3/manifest.webmanifest">
+  <link rel="stylesheet" href="/261124/v3/portal.css">
+  <script type="module" src="/261124/v3/portal.js"></script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="6" height="6" rx="1"/><rect x="14.5" y="3.5" width="6" height="6" rx="1"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/><rect x="14.5" y="14.5" width="6" height="6" rx="1"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 14a4.5 4.5 0 0 0 8 0M8.5 9.5h.01m7 0h.01"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2.5 2.5H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 11h18"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M7.5 3v4m9-4v4M4 10h16m-11 5 2 2 4-4"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 21s7-3.5 7-9V6l-7-3-7 3v6c0 5.5 7 9 7 9Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-document" viewBox="0 0 24 24"><path d="M6 3.5h8l4 4V20H6zM14 4v4h4M9 12h6m-6 4h6"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="m3.5 7 1.5 1.5L8 5.5m-4.5 7.5 1.5 1.5L8 11.5m3-4.5h9m-9 6h9m-9 6h9M4 19h.01"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="4.5" rx="1"/><path d="M5 9v11h14V9m-9 4h4"/></symbol>
+    <symbol id="i-status" viewBox="0 0 24 24"><path d="M4 19.5V13m5 6.5V9m5 10.5v-5m5 5V5m-16 15h18"/></symbol>
+  </svg>
+  <section class="intro" id="home" aria-labelledby="intro-title">
+    <video class="intro-video" id="intro-video" poster="/261124/v3/harbor-intro.jpg" data-src="/261124/v3/harbor-loop.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+    <div class="intro-content">
+      <img class="intro-company" src="/261124/v3/taehwa-logo.png" width="325" height="57" alt="태화기업 TAEHWA">
+      <h1 id="intro-title">업무자동화 3차 종합플랫폼</h1>
+      <a class="intro-link" href="#programs">참여자 프로그램 보기 <svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></a>
+    </div>
+    <button class="motion-toggle" id="motion-toggle" type="button" hidden>영상 재생</button>
+  </section>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <img src="/261124/v3/hrdk-logo.png" alt="HRDK 한국산업인력공단" width="298" height="51">
+        <a href="#programs"><img src="/261124/v3/ai-training-center.png" alt="경남경영자총협회 중소기업AI훈련확산센터" width="734" height="57"></a>
+      </div>
+      <form class="tool-search" id="tool-search" role="search">
+        <label for="tool-query" class="screen-reader">업무 도구 검색</label>
+        <input id="tool-query" type="search" placeholder="프로그램 검색" autocomplete="off">
+        <button type="submit" aria-label="검색"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg></button>
+      </form>
+      <div class="jump">
+        <svg class="icon jump-icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+        <label for="quick-jump">바로가기</label>
+        <select id="quick-jump" aria-label="바로가기"><option value="programs">업무 홈</option><option value="home">시작 화면</option></select>
+        <svg class="icon jump-chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>
+      </div>
+    </div>
+  </header>
+  <div class="workspace">
+    <header class="screen-bar" id="screen-bar" hidden><a href="#programs">업무 홈</a><span aria-hidden="true">/</span><strong id="screen-name" tabindex="-1">업무 홈</strong></header>
+    <main id="programs" tabindex="-1">
+      <p id="search-message" class="search-message" role="status" hidden></p>
+      <div class="dashboard">
+        <section id="tools-guide" class="participants" aria-labelledby="participants-heading">
+          <div class="section-head"><h2 id="participants-heading">참여자 프로그램</h2></div>
+          <div class="participant-list" id="participant-list">
+            <a class="program" href="#inventory" data-screen="inventory" data-search="최영태 ERP 원자재 재고 대조 코일 실사 수불 검토">
+              <span class="tile-icon mint" aria-hidden="true"><svg class="icon"><use href="#i-archive"></use></svg></span>
+              <span class="program-info"><span class="author">최영태 책임</span><strong>코일·원자재 재고 대조</strong><small>ERP와 실사 수량을 대조하고 수불 이력과 조치 내역을 확인합니다.</small></span>
+              <span class="program-action" aria-hidden="true">프로그램 열기 <span>›</span></span>
+            </a>
+            <a class="program" href="#studio" data-screen="studio" data-search="이미지 캔버스 움짤 gif">
+              <span class="tile-icon orchid" aria-hidden="true"><svg class="icon"><use href="#i-smile"></use></svg></span>
+              <span class="program-info"><span class="author">남기종</span><strong>이모티콘 제작기</strong><small>그림과 문구, 스티커로 정지·움직이는 이모티콘을 만듭니다.</small></span>
+              <span class="program-action" aria-hidden="true">프로그램 열기 <span>›</span></span>
+            </a>
+            <a class="program" href="#folder" data-screen="folder" data-search="공유 폴더">
+              <span class="tile-icon amber" aria-hidden="true"><svg class="icon"><use href="#i-folder"></use></svg></span>
+              <span class="program-info"><span class="author">송춘빈</span><strong>공유폴더 대시보드</strong><small>PC에서 폴더를 선택해 파일 목록과 용량을 확인합니다.</small></span>
+              <span class="program-action" aria-hidden="true">프로그램 열기 <span>›</span></span>
+            </a>
+            <a class="program" href="#desk" data-screen="desk" data-search="달력 캘린더 고정 업무">
+              <span class="tile-icon blue" aria-hidden="true"><svg class="icon"><use href="#i-calendar"></use></svg></span>
+              <span class="program-info"><span class="author">이어진</span><strong>업무 데스크</strong><small>할 일과 반복 업무를 챙기고 월간 일정과 메모를 관리합니다.</small></span>
+              <span class="program-action" aria-hidden="true">프로그램 열기 <span>›</span></span>
+            </a>
+            <a class="program" href="#safety" data-screen="safety" data-search="현장 안전 순회 점검">
+              <span class="tile-icon mint" aria-hidden="true"><svg class="icon"><use href="#i-shield"></use></svg></span>
+              <span class="program-info"><span class="author">오태경</span><strong>현장안전포털</strong><small>현장 순회점검을 기록하고 안전 일정과 보고서를 확인합니다.</small></span>
+              <span class="program-action" aria-hidden="true">프로그램 열기 <span>›</span></span>
+            </a>
+          </div>
+        </section>
+        <section class="tool-section" id="support-tools" aria-labelledby="tools-heading">
+          <div class="section-head"><h2 id="tools-heading">업무 지원 도구</h2></div>
+          <div class="tool-grid" id="tool-grid">
+            <a class="tile" href="#documents" data-screen="documents" data-search="품의서 문서 초안 회의록 작성 양식 인쇄">
+              <span class="tile-icon violet" aria-hidden="true"><svg class="icon"><use href="#i-document"></use></svg></span>
+              <strong>품의서 작성</strong>
+            </a>
+            <a class="tile" href="#desk-local" data-screen="desk-local" data-search="내 업무 할 일 기존 기록 일정 메모">
+              <span class="tile-icon cyan" aria-hidden="true"><svg class="icon"><use href="#i-list"></use></svg></span>
+              <strong>내 업무 기록</strong>
+            </a>
+            <a class="tile" href="#safety-local" data-screen="safety-local" data-search="내 현장 점검 기존 기록 위험 조치 사진">
+              <span class="tile-icon steel" aria-hidden="true"><svg class="icon"><use href="#i-archive"></use></svg></span>
+              <strong>내 점검 기록</strong>
+            </a>
+          </div>
+        </section>
+        <section class="summary-panel" aria-labelledby="records-heading">
+          <div class="summary-heading">
+            <span class="summary-icon"><svg class="icon" aria-hidden="true"><use href="#i-status"></use></svg></span>
+            <h2 id="records-heading">내 업무 현황</h2>
+          </div>
+          <time id="today"></time>
+          <div class="summary">
+            <a href="#desk-local"><span>오늘 할 일</span><strong id="task-count">0</strong><small>미완료</small></a>
+            <a href="#safety-local"><span>현장 조치</span><strong id="safety-count">0</strong><small>대기·진행</small></a>
+            <a href="#documents"><span>작성 문서</span><strong id="document-count">0</strong><small>브라우저 저장</small></a>
+          </div>
+        </section>
+        <section id="recent-panel" class="recent-panel" aria-labelledby="recent-heading">
+          <div class="section-head"><h2 id="recent-heading">최근 저장 문서</h2><a class="small-link" href="#documents">문서 관리</a></div>
+          <div class="recent-list">
+            <p class="empty" id="recent-empty">이 브라우저에 저장한 문서가 없습니다.</p>
+            <ul id="recent-documents" hidden></ul>
+          </div>
+        </section>
+      </div>
+      <p class="empty" id="no-tools" hidden>일치하는 도구가 없습니다. 다른 검색어를 입력해 보세요.</p>
+      <button type="button" id="install-platform" class="install" hidden>앱 설치</button>
+    </main>
+    <section id="tools" aria-label="업무 도구 화면" hidden></section>
+  </div>
+  <aside id="reminder" class="reminder" role="status" hidden><div><strong id="reminder-title"></strong><p id="reminder-detail"></p></div><button type="button" id="dismiss-reminder" aria-label="알림 닫기">×</button></aside>
+</body>
+</html>
