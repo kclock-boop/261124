@@ -1,5 +1,5 @@
 const cachePrefix = "taehwa-document-workspace-";
-const cacheName = cachePrefix + "v12";
+const cacheName = cachePrefix + "v13";
 const shell = [
   "/",
   "/index.html",
