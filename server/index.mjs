@@ -24,6 +24,7 @@ const assets = new Map([
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
   ["/favicon.svg", ["favicon.svg", "image/svg+xml"]],
+  ["/harbor-intro.jpg", ["harbor-intro.jpg", "image/jpeg"]],
   ["/manifest.webmanifest", ["manifest.webmanifest", "application/manifest+json; charset=utf-8"]],
   ["/sw.js", ["sw.js", "text/javascript; charset=utf-8"]],
   ["/icon-192.png", ["icon-192.png", "image/png"]],

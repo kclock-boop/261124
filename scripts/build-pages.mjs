@@ -15,7 +15,7 @@ const targets = new Map([
     "modules/desk.html", "modules/safety.html", "modules/moyang.html",
     "modules/folder.html", "tool-v2.css", "folder.js",
     "styles.css", "app.js", "sw.js", "manifest.webmanifest", "favicon.svg",
-    "icon-192.png", "icon-512.png"
+    "icon-192.png", "icon-512.png", "harbor-intro.jpg"
   ].map(name => [name, name]),
   ...(privateSite ? ["modules/review.html", "review.js"] : ["modules/desk-participant.html", "modules/safety-participant.html"])
     .map(name => [name, name])
@@ -64,7 +64,7 @@ function publicContent(source, text) {
 const output = resolve(destination);
 for (const [source, target] of targets) {
   const input = new URL("../public/" + source, import.meta.url);
-  const content = source.endsWith(".png") ? await readFile(input) : publicContent(source, await readFile(input, "utf8"));
+  const content = /\.(?:png|jpg)$/.test(source) ? await readFile(input) : publicContent(source, await readFile(input, "utf8"));
   const file = resolve(output, target);
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, content);
