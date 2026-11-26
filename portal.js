@@ -247,7 +247,6 @@ reduceMotion.addEventListener("change", event => {
   syncIntroPlayback();
 });
 motionButton.hidden = false;
-syncIntroMotion();
 let installPrompt;
 window.addEventListener("beforeinstallprompt", event => {
   event.preventDefault();
