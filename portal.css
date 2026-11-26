@@ -59,9 +59,9 @@ button, select { cursor: pointer; }
 .masthead { background: #eef3f8; }
 .masthead-inner {
   max-width: var(--container); min-height: var(--header-height); margin: 0 auto; padding: 18px 40px;
-  display: grid; grid-template-columns: minmax(240px, 330px) minmax(0, 1fr) minmax(230px, 300px); align-items: center; gap: 20px;
+  display: grid; grid-template-columns: minmax(205px, 250px) minmax(0, 1fr) minmax(230px, 300px); align-items: center; gap: 20px;
 }
-.brand { display: block; min-width: 0; }
+.brand { display: block; min-width: 0; width: 100%; justify-self: start; }
 .brand img { display: block; width: 100%; height: auto; border-radius: 5px; }
 .tool-search, .jump {
   height: 56px; min-width: 0; display: flex; align-items: center; gap: 10px;
@@ -203,7 +203,7 @@ iframe { display: block; width: 100%; height: calc(100dvh - var(--header-height)
 .reminder button { border: 0; border-radius: 5px; background: #365887; color: #fff; }
 
 @media (max-width: 1100px) {
-  .masthead-inner { grid-template-columns: minmax(220px, 265px) minmax(0, 1fr) minmax(195px, 235px); }
+  .masthead-inner { grid-template-columns: minmax(200px, 235px) minmax(0, 1fr) minmax(195px, 235px); }
   .masthead-inner, #programs, .screen-bar, .source-toolbar { padding-inline: 24px; }
   .dashboard { grid-template-columns: minmax(0, 1.65fr) minmax(258px, 1fr); gap: 18px; }
   .tile { padding: 11px; }
@@ -211,7 +211,7 @@ iframe { display: block; width: 100%; height: calc(100dvh - var(--header-height)
 @media (max-width: 780px) {
   :root { --header-height: 128px; }
   .masthead-inner { min-height: var(--header-height); grid-template-columns: minmax(0, 1fr) minmax(145px, 224px); gap: 9px 12px; padding: 12px 16px; }
-  .brand { grid-column: 1 / -1; width: min(100%, 280px); }
+  .brand { grid-column: 1 / -1; width: min(100%, 235px); }
   .tool-search { grid-row: 2; grid-column: 1; }
   .tool-search, .jump { height: 48px; }
   .jump { grid-row: 2; grid-column: 2; }
@@ -224,7 +224,7 @@ iframe { display: block; width: 100%; height: calc(100dvh - var(--header-height)
 }
 @media (max-width: 440px) {
   .masthead-inner { grid-template-columns: minmax(0, 1fr) 112px; }
-  .brand { width: min(100%, 245px); }
+  .brand { width: min(100%, 215px); }
   .tool-search { padding-left: 12px; }
   .tool-search input { font-size: 14px; }
   .jump label, .jump-icon { display: none; }

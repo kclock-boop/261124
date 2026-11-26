@@ -1,5 +1,5 @@
 const cachePrefix = "taehwa-pages-/261124/-";
-const cacheName = cachePrefix + "v16";
+const cacheName = cachePrefix + "v17";
 const shell = [
   "/261124/",
   "/261124/index.html",
