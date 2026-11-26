@@ -1,19 +1,23 @@
 import { currentOccurrence, localDay, read, readDesk, todayTasks } from "/261124/desk-data.js";
 
 const screens = {
-  home: ["업무 홈"],
+  home: ["시작 화면"],
+  programs: ["업무 홈"],
   folder: ["공유폴더 대시보드", "/261124/modules/folder.html"],
   desk: ["업무 데스크", "/261124/modules/desk-participant.html", "desk-local"],
   safety: ["현장안전포털", "/261124/modules/safety-participant.html", "safety-local"],
   "desk-local": ["내 업무 데스크", "/261124/modules/desk.html"],
   "safety-local": ["내 현장점검 기록", "/261124/modules/safety.html"],
   documents: ["품의서 작성", "/261124/documents.html"],
-  studio: ["이모티콘 제작기", "/261124/modules/moyang.html"],
-  "tools-guide": ["도구 안내"]
+  studio: ["이모티콘 제작기", "/261124/modules/moyang.html"]
 };
 const $ = id => document.getElementById(id);
 const frames = new Map();
-const toolCards = [...$("tool-grid").querySelectorAll("[data-screen]")];
+const participantCards = [...$("participant-list").querySelectorAll("[data-screen]")];
+const supportCards = [...$("tool-grid").querySelectorAll("[data-screen]")];
+const toolCards = [...participantCards, ...supportCards];
+const intro = $("home");
+const programs = $("programs");
 const jump = $("quick-jump");
 const dateFormat = new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium" });
 
@@ -32,7 +36,9 @@ function filterTools() {
     card.hidden = !match;
     return match;
   });
-  $("tools-guide").hidden = Boolean(query);
+  programs.classList.toggle("is-searching", Boolean(query));
+  $("tools-guide").hidden = participantCards.every(card => card.hidden);
+  $("support-tools").hidden = supportCards.every(card => card.hidden);
   $("search-message").hidden = !query;
   $("search-message").textContent = query ? "검색 결과 " + matches.length + "개" : "";
   $("no-tools").hidden = matches.length !== 0;
@@ -88,10 +94,12 @@ function refreshSummary() {
 
 function navigate(event) {
   const target = location.hash.slice(1);
-  const key = Object.hasOwn(screens, target) ? target : "home";
+  const section = target === "tools-guide" ? "programs" : target;
+  const key = Object.hasOwn(screens, section) ? section : "home";
   const [label, route, localScreen] = screens[key];
   $("screen-name").textContent = label;
-  $("home").hidden = Boolean(route);
+  intro.hidden = Boolean(route);
+  programs.hidden = Boolean(route);
   $("screen-bar").hidden = !route;
   $("tools").hidden = !route;
   jump.value = key;
@@ -130,12 +138,16 @@ function navigate(event) {
     frames.set(key, panel);
   }
   for (const [id, frame] of frames) frame.hidden = id !== key;
-  if (key === "tools-guide") {
-    clearSearch();
-    requestAnimationFrame(() => $("tools-guide").scrollIntoView({ block: "start" }));
+  if (key === "programs") {
+    requestAnimationFrame(() => {
+      if (document.activeElement !== $("tool-query")) programs.focus({ preventScroll: true });
+      programs.scrollIntoView({ block: "start" });
+    });
   } else if (event && route) {
     window.scrollTo(0, 0);
     $("screen-name").focus({ preventScroll: true });
+  } else if (event && key === "home") {
+    window.scrollTo(0, 0);
   }
   refreshSummary();
 }
@@ -179,7 +191,7 @@ $("dismiss-reminder").addEventListener("click", () => {
 });
 window.addEventListener("hashchange", navigate);
 $("tool-query").addEventListener("input", () => {
-  if ($("home").hidden && $("tool-query").value.trim()) location.hash = "home";
+  if (programs.hidden && $("tool-query").value.trim()) location.hash = "programs";
   filterTools();
 });
 $("tool-search").addEventListener("submit", event => {
@@ -188,15 +200,27 @@ $("tool-search").addEventListener("submit", event => {
   if ($("tool-query").value.trim() && matches.length === 1) {
     location.hash = matches[0].hash;
   } else {
-    if ($("home").hidden) location.hash = "home";
-    requestAnimationFrame(() => $("tools-heading").scrollIntoView({ block: "nearest" }));
+    if (programs.hidden) location.hash = "programs";
+    else programs.scrollIntoView({ block: "start" });
   }
 });
 jump.addEventListener("change", () => {
-  if (jump.value === "home") clearSearch();
+  if (jump.value === "home" || jump.value === "programs") clearSearch();
   location.hash = jump.value;
 });
-for (const homeLink of document.querySelectorAll('a[href="#home"]')) homeLink.addEventListener("click", clearSearch);
+for (const homeLink of document.querySelectorAll('a[href="#programs"]')) homeLink.addEventListener("click", clearSearch);
+const motionButton = $("motion-toggle");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+function syncIntroMotion() {
+  intro.classList.toggle("is-animated", !reduceMotion.matches);
+  motionButton.hidden = reduceMotion.matches;
+}
+motionButton.addEventListener("click", () => {
+  const paused = intro.classList.toggle("is-paused");
+  motionButton.textContent = paused ? "움직임 재생" : "움직임 멈추기";
+});
+reduceMotion.addEventListener("change", syncIntroMotion);
+syncIntroMotion();
 let installPrompt;
 window.addEventListener("beforeinstallprompt", event => {
   event.preventDefault();
