@@ -14,7 +14,7 @@ const screens = {
 };
 const $ = id => document.getElementById(id);
 const frames = new Map();
-const participantCards = [...$("participant-list").querySelectorAll("[data-screen]")];
+const participantCards = [...$("participant-list").querySelectorAll("[data-screen]:not([data-v3-tool][hidden])")];
 const supportCards = [...$("tool-grid").querySelectorAll("[data-screen]")];
 const toolCards = [...participantCards, ...supportCards];
 const intro = $("home");

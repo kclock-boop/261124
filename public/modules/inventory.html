@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>코일·원자재 재고 대조 · 태화기업</title>
+  <link rel="stylesheet" href="/inventory.css">
+  <script type="module" src="/inventory.js"></script>
+</head>
+<body>
+  <main class="inventory">
+    <header class="intro">
+      <div>
+        <p class="owner">최영태 책임 · 태화기업</p>
+        <h1>코일·원자재 재고 대조</h1>
+        <p class="intro-copy">ERP 재고와 현장 실사를 코일별로 비교하고, 확인이 필요한 수불·조치 내역을 관리합니다.</p>
+      </div>
+      <div class="dataset">
+        <span class="dataset-mode" id="dataset-mode">시연용 가상 데이터</span>
+        <span id="reference-date"></span>
+      </div>
+    </header>
+
+    <nav class="sections" aria-label="재고 관리">
+      <button type="button" data-view="overview" aria-current="page">현황</button>
+      <button type="button" data-view="import">자료 등록</button>
+      <button type="button" data-view="compare">재고 대조</button>
+      <button type="button" data-view="trace">수불 추적</button>
+      <button type="button" data-view="causes">원인 후보</button>
+      <button type="button" data-view="review">검토·조치</button>
+      <button type="button" data-view="report">보고서</button>
+    </nav>
+
+    <section class="panel" data-panel="overview" aria-labelledby="overview-heading">
+      <div class="section-head">
+        <h2 id="overview-heading" tabindex="-1">재고 현황</h2>
+        <button class="primary" type="button" data-open="compare">재고 대조 보기</button>
+      </div>
+      <p id="dataset-note" class="notice"></p>
+      <dl class="metrics" id="metrics"></dl>
+      <div class="overview-grid">
+        <article class="surface">
+          <h3>확인이 필요한 코일</h3>
+          <div id="priority-items" class="priority-items"></div>
+        </article>
+        <article class="surface insight" id="overview-insight"></article>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="import" aria-labelledby="import-heading" hidden>
+      <div class="section-head">
+        <h2 id="import-heading" tabindex="-1">자료 등록·검증</h2>
+        <div class="actions"><button type="button" id="sample-mode">가상 데이터 보기</button><button type="button" id="saved-mode" hidden>마지막 등록 자료 열기</button></div>
+      </div>
+      <p class="notice">양식의 열 제목을 유지한 CSV를 등록하세요. ERP와 실사는 같은 기준일 자료를 사용하세요. 자료는 이 브라우저에 저장됩니다.</p>
+      <form id="import-form" class="surface import-form">
+        <label>기준일 <input id="import-date" type="date" required></label>
+        <div class="file-fields">
+          <div><label>ERP 재고 CSV <input id="erp-file" type="file" accept=".csv,text/csv" required></label><button type="button" data-template="erp">ERP 양식 받기</button></div>
+          <div><label>현장 실사 CSV <input id="actual-file" type="file" accept=".csv,text/csv" required></label><button type="button" data-template="actual">실사 양식 받기</button></div>
+          <div><label>수불 이력 CSV (선택) <input id="movements-file" type="file" accept=".csv,text/csv"></label><button type="button" data-template="movements">수불 양식 받기</button></div>
+        </div>
+        <p class="muted">수량 단위는 kg입니다. 수불 변동량은 재고 증가를 양수, 감소를 음수로 입력합니다. 파일당 최대 1MB·5,000행입니다.</p>
+        <button class="primary" id="import-submit" type="submit">검증 후 등록</button>
+        <p class="feedback" id="import-feedback" role="status"></p>
+      </form>
+      <details class="surface">
+        <summary>품목·코일 기준정보와 연동 안내</summary>
+        <p>품목코드와 코일번호가 모두 같을 때 한 건으로 대조합니다. ERP나 실사에만 있는 코일은 누락 확인 대상으로 표시합니다.</p>
+        <p>3차 시연에서는 CSV로 자료를 가져옵니다. ERP와 현장 시스템에서 직접 가져오려면 연결 방식과 사용 권한을 별도로 정해야 합니다.</p>
+      </details>
+    </section>
+
+    <section class="panel" data-panel="compare" aria-labelledby="compare-heading" hidden>
+      <div class="section-head"><h2 id="compare-heading" tabindex="-1">재고 대조</h2></div>
+      <div class="filters">
+        <label>품목 검색 <input id="comparison-query" type="search" placeholder="품목, 코일번호, 자재명"></label>
+        <label>표시 범위 <select id="comparison-filter"><option value="all">전체</option><option value="differences">차이·자료 누락</option><option value="open">미조치</option><option value="matched">일치</option></select></label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">품목별 ERP·실사 재고와 차이</caption>
+          <thead><tr><th scope="col">품목 / 코일</th><th scope="col">자재명</th><th scope="col" class="number">ERP(kg)</th><th scope="col" class="number">실사(kg)</th><th scope="col" class="number">차이(kg)</th><th scope="col">상태</th><th scope="col">조사</th></tr></thead>
+          <tbody id="comparison-rows"></tbody>
+        </table>
+      </div>
+      <div class="page-controls"><button type="button" id="comparison-prev">이전</button><span id="comparison-count" role="status"></span><button type="button" id="comparison-next">다음</button></div>
+    </section>
+
+    <section class="panel" data-panel="trace" aria-labelledby="trace-heading" hidden>
+      <div class="section-head"><h2 id="trace-heading" tabindex="-1">수불 역추적</h2></div>
+      <label class="picker">품목 / 코일 <select data-item-picker aria-label="수불을 조회할 코일"></select></label>
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">선택한 코일 수불 이력</caption>
+          <thead><tr><th scope="col">일자</th><th scope="col">구분</th><th scope="col" class="number">변동량(kg)</th><th scope="col">전표·작업번호</th><th scope="col">메모</th></tr></thead>
+          <tbody id="trace-rows"></tbody>
+        </table>
+      </div>
+      <p id="trace-summary" class="muted"></p>
+      <button class="primary" type="button" data-open="causes">원인 후보 보기</button>
+    </section>
+
+    <section class="panel" data-panel="causes" aria-labelledby="causes-heading" hidden>
+      <div class="section-head"><h2 id="causes-heading" tabindex="-1">원인 후보</h2></div>
+      <p class="notice">재고 차이와 기준일 이전의 수불 기록을 규칙으로 대조해 확인할 후보를 표시합니다. 실제 원인은 담당자가 전표와 현장 기록을 검토해 판단합니다.</p>
+      <label class="picker">품목 / 코일 <select data-item-picker aria-label="원인 후보를 조회할 코일"></select></label>
+      <article id="cause-result" class="surface insight"></article>
+      <button class="primary" type="button" data-open="review">검토·조치 기록</button>
+    </section>
+
+    <section class="panel" data-panel="review" aria-labelledby="review-heading" hidden>
+      <div class="section-head"><h2 id="review-heading" tabindex="-1">검토·조치 관리</h2></div>
+      <label class="picker">품목 / 코일 <select data-item-picker aria-label="조치를 기록할 코일"></select></label>
+      <p class="muted" id="review-context"></p>
+      <form id="review-form" class="surface review-form">
+        <label>진행 상태 <select id="review-status"><option>확인 대기</option><option>조사 중</option><option>조치 완료</option></select></label>
+        <label>담당 <input id="review-person" type="text" maxlength="50"></label>
+        <label class="wide">확인 결과와 다음 조치 <textarea id="review-note" rows="4" maxlength="500"></textarea></label>
+        <button class="primary" type="submit">조치 저장</button>
+        <p class="feedback wide" id="review-feedback" role="status"></p>
+      </form>
+    </section>
+
+    <section class="panel" data-panel="report" aria-labelledby="report-heading" hidden>
+      <div class="section-head">
+        <h2 id="report-heading" tabindex="-1">재고 대조 보고서</h2>
+        <button type="button" class="primary" id="print-report">인쇄 / PDF 저장</button>
+      </div>
+      <p class="notice" id="report-summary"></p>
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">차이·누락 건의 검토 결과</caption>
+          <thead><tr><th scope="col">품목 / 코일</th><th scope="col">자재명</th><th scope="col" class="number">차이(kg)</th><th scope="col">상태</th><th scope="col">담당</th><th scope="col">확인 결과와 조치</th></tr></thead>
+          <tbody id="report-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

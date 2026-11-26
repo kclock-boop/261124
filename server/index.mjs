@@ -38,6 +38,20 @@ const assets = new Map([
 const localHost = "127.0.0.1";
 export const defaultUrl = "http://" + localHost + ":8888";
 export const serviceName = "taehwa-document-workspace";
+const html = "text/html; charset=utf-8";
+const v3Assets = new Map(assets)
+  .set("/", ["index.html", html])
+  .set("/index.html", ["index.html", html])
+  .set("/documents", ["documents.html", html])
+  .set("/documents.html", ["documents.html", html])
+  .set("/modules/inventory.html", ["modules/inventory.html", html])
+  .set("/modules/desk-participant-v3.html", ["modules/desk-participant-v3.html", html, true])
+  .set("/modules/safety-participant.html", ["modules/safety-participant.html", html, true])
+  .set("/inventory.css", ["inventory.css", "text/css; charset=utf-8"])
+  .set("/inventory.js", ["inventory.js", "text/javascript; charset=utf-8"])
+  .set("/inventory-data.js", ["inventory-data.js", "text/javascript; charset=utf-8"]);
+v3Assets.delete("/review.js");
+v3Assets.delete("/modules/review.html");
 
 const headers = {
   "cache-control": "no-store",
@@ -85,7 +99,8 @@ async function serveVideo(req, res, file, contentType) {
   stream.pipe(res);
 }
 
-export async function startServer(port = Number(new URL(defaultUrl).port)) {
+export async function startServer(port = Number(new URL(defaultUrl).port), edition = 2) {
+  const activeAssets = edition === 3 ? v3Assets : assets;
   const server = createServer(async (req, res) => {
     try {
       const activePort = server.address().port;
@@ -102,7 +117,7 @@ export async function startServer(port = Number(new URL(defaultUrl).port)) {
         return;
       }
       if (url.pathname === "/api/health" && req.method === "GET") {
-        sendJson(res, 200, { service: serviceName, edition: 2 });
+        sendJson(res, 200, { service: serviceName, edition });
         return;
       }
       if (url.pathname === "/api/generate") {
@@ -126,7 +141,7 @@ export async function startServer(port = Number(new URL(defaultUrl).port)) {
         res.end(Buffer.from(await response.arrayBuffer()));
         return;
       }
-      const asset = assets.get(url.pathname);
+      const asset = activeAssets.get(url.pathname);
       if (!asset || !["GET", "HEAD"].includes(req.method)) {
         res.writeHead(404, headers).end("Not found");
         return;
@@ -140,7 +155,7 @@ export async function startServer(port = Number(new URL(defaultUrl).port)) {
       const content = await readFile(file);
       res.writeHead(200, {
         ...headers, "Content-Type": contentType,
-        "content-security-policy": filename === "portal.html"
+        "content-security-policy": url.pathname === "/" || url.pathname === "/index.html"
           ? portalPolicy : originalModule ? modulePolicy : headers["content-security-policy"]
       });
       res.end(req.method === "HEAD" ? undefined : content);
