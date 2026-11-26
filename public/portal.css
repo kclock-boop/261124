@@ -39,7 +39,7 @@ button, select { cursor: pointer; }
     linear-gradient(0deg, #0a142486, transparent 45%);
 }
 .intro-content { width: min(100%, var(--container)); margin: 0 auto; padding-inline: clamp(16px, 4vw, 52px); }
-.intro-company { font-size: clamp(14px, 1.35vw, 19px); font-weight: 700; color: #d3e5fa; }
+.intro-company { display: block; width: clamp(134px, 14vw, 192px); height: auto; border-radius: 4px; }
 .intro h1 {
   margin: 7px 0 16px; font-size: clamp(25px, 3.45vw, 49px); line-height: 1.12;
   letter-spacing: -.06em; word-break: keep-all;

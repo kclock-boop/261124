@@ -15,7 +15,7 @@ const targets = new Map([
     "modules/desk.html", "modules/safety.html", "modules/moyang.html",
     "modules/folder.html", "tool-v2.css", "folder.js",
     "styles.css", "app.js", "sw.js", "manifest.webmanifest", "favicon.svg",
-    "icon-192.png", "icon-512.png", "harbor-intro.jpg", "harbor-loop.mp4"
+    "icon-192.png", "icon-512.png", "harbor-intro.jpg", "harbor-loop.mp4", "taehwa-logo.png"
   ].map(name => [name, name]),
   ...(privateSite ? ["modules/review.html", "review.js"] : ["modules/desk-participant.html", "modules/safety-participant.html"])
     .map(name => [name, name])

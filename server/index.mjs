@@ -26,6 +26,7 @@ const assets = new Map([
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
   ["/favicon.svg", ["favicon.svg", "image/svg+xml"]],
   ["/harbor-intro.jpg", ["harbor-intro.jpg", "image/jpeg"]],
+  ["/taehwa-logo.png", ["taehwa-logo.png", "image/png"]],
   ["/harbor-loop.mp4", ["harbor-loop.mp4", "video/mp4"]],
   ["/manifest.webmanifest", ["manifest.webmanifest", "application/manifest+json; charset=utf-8"]],
   ["/sw.js", ["sw.js", "text/javascript; charset=utf-8"]],
