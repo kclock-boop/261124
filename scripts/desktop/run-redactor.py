@@ -9,6 +9,9 @@ from app import make_server
 
 
 def main():
+    # Initialize Excel's native dependencies before handling requests on worker threads.
+    import openpyxl
+
     data_dir = Path(sys.argv[1])
     data_dir.mkdir(parents=True, exist_ok=True)
     server = make_server(0, data_dir)
