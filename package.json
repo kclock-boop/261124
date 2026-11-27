@@ -7,6 +7,6 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env scripts/serve.mjs",
     "dev": "npm start",
-    "check": "node --check public/portal.js && node --check public/desk.js && node --check public/desk-data.js && node --check public/app.js && node --check public/sw.js && node --check public/review.js && node --check public/folder.js && node --check public/inventory.js && node --check public/inventory-data.js && node --check server/generate.mjs && node --check server/index.mjs && node --check scripts/serve.mjs && node --check scripts/launch.mjs && node --check scripts/build-pages.mjs"
+    "check": "node --check public/portal.js && node --check public/desk.js && node --check public/desk-data.js && node --check public/app.js && node --check public/sw.js && node --check public/review.js && node --check public/folder.js && node --check public/inventory.js && node --check public/inventory-data.js && node --check server/generate.mjs && node --check server/index.mjs && node --check server/redactor.mjs && node --check scripts/serve.mjs && node --check scripts/launch.mjs && node --check scripts/build-pages.mjs"
   }
 }

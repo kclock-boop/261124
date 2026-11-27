@@ -1,7 +1,7 @@
 "$schema" = "https://open-api.netlify.com/netlify.schema.json"
 
 [build]
-  command = "node scripts/build-pages.mjs dist / && node scripts/build-pages.mjs dist/v3 /v3/ --v3"
+  command = "node scripts/build-pages.mjs dist / && node scripts/build-pages.mjs dist/v3 /v3/ --v3 && node scripts/build-pages.mjs dist/v4 /v4/ --v4"
   publish = "dist"
 
 [build.environment]

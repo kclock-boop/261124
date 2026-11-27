@@ -1,9 +1,10 @@
-import { createReadStream } from "node:fs";
+import { createReadStream, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { once } from "node:events";
 import { Readable } from "node:stream";
 import generate from "./generate.mjs";
+import { createRedactor } from "./redactor.mjs";
 
 const assets = new Map([
   ["/", ["portal.html", "text/html; charset=utf-8"]],
@@ -52,6 +53,11 @@ const v3Assets = new Map(assets)
   .set("/inventory-data.js", ["inventory-data.js", "text/javascript; charset=utf-8"]);
 v3Assets.delete("/review.js");
 v3Assets.delete("/modules/review.html");
+const v4Assets = new Map(v3Assets)
+  .set("/modules/safety-participant-v4.html", ["modules/safety-participant-v4.html", html, true])
+  .set("/modules/inventory-participant-v4.html", ["modules/inventory-participant-v4.html", html, true])
+  .set("/modules/redactor-start.html", ["modules/redactor-start.html", html]);
+v4Assets.delete("/modules/safety-participant.html");
 
 const headers = {
   "cache-control": "no-store",
@@ -100,7 +106,9 @@ async function serveVideo(req, res, file, contentType) {
 }
 
 export async function startServer(port = Number(new URL(defaultUrl).port), edition = 2) {
-  const activeAssets = edition === 3 ? v3Assets : assets;
+  const activeAssets = edition === 4 ? v4Assets : edition === 3 ? v3Assets : assets;
+  const localRedactor = edition === 4 && existsSync(new URL("../private-redactor/run.py", import.meta.url))
+    ? createRedactor() : null;
   const server = createServer(async (req, res) => {
     try {
       const activePort = server.address().port;
@@ -118,6 +126,17 @@ export async function startServer(port = Number(new URL(defaultUrl).port), editi
       }
       if (url.pathname === "/api/health" && req.method === "GET") {
         sendJson(res, 200, { service: serviceName, edition });
+        return;
+      }
+      if (url.pathname === "/local-tools/open-redactor" && localRedactor &&
+          req.method === "GET" && req.headers["sec-fetch-site"] === "same-origin") {
+        try {
+          const location = await localRedactor.open();
+          res.writeHead(303, { ...headers, Location: location }).end();
+        } catch {
+          res.writeHead(503, { ...headers, "Content-Type": "text/plain; charset=utf-8" })
+            .end("자료 선택 가림을 시작하지 못했습니다. 4차 Windows 앱을 종료한 뒤 다시 실행해 주세요.");
+        }
         return;
       }
       if (url.pathname === "/api/generate") {
@@ -153,10 +172,12 @@ export async function startServer(port = Number(new URL(defaultUrl).port), editi
         return;
       }
       const content = await readFile(file);
+      const policy = originalModule ? modulePolicy : headers["content-security-policy"];
       res.writeHead(200, {
         ...headers, "Content-Type": contentType,
         "content-security-policy": url.pathname === "/" || url.pathname === "/index.html"
-          ? portalPolicy : originalModule ? modulePolicy : headers["content-security-policy"]
+          ? portalPolicy : filename === "modules/safety-participant-v4.html"
+            ? policy + "; connect-src 'self' https://api.open-meteo.com" : policy
       });
       res.end(req.method === "HEAD" ? undefined : content);
     } catch {
@@ -165,6 +186,7 @@ export async function startServer(port = Number(new URL(defaultUrl).port), editi
     }
   });
 
+  if (localRedactor) server.on("close", localRedactor.close);
   server.listen(port, localHost);
   await once(server, "listening");
   return server;

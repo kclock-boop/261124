@@ -1,5 +1,13 @@
 # 태화기업 업무자동화 2차
 
+## 업무자동화 4차
+
+[4차 발표용 웹 열기](https://taehwapbl.netlify.app/v4/) · [GitHub Pages](https://kclock-boop.github.io/261124/v4/)
+
+현장안전포털에는 MSDS 등록을 포함한 최신 오태경 님 원본을 넣었습니다. 최영태 책임의 재고 과제는 **발표용 원본**을 먼저 열며, 위쪽의 **CSV 재고 대조 열기**에서 자료 등록과 대조를 실습할 수 있습니다.
+
+비공개 자료 가림 도구는 Windows 앱에 포함해 이 PC의 별도 로컬 창에서 실행할 수 있습니다. 빌드 시 `-FourthEdition -RedactorSource <원본 폴더> -RedactorPython <런타임 폴더> -NodeLicense <파일>` 옵션을 사용하세요.
+
 ## 업무자동화 3차
 
 [3차 종합플랫폼 열기](https://taehwapbl.netlify.app/v3/) · [GitHub Pages](https://kclock-boop.github.io/261124/v3/)

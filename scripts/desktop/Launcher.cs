@@ -9,7 +9,11 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Windows.Forms;
 
-#if TAEHWA_V3
+#if TAEHWA_V4
+[assembly: AssemblyTitle("태화기업 업무자동화 4차")]
+[assembly: AssemblyProduct("태화기업 업무자동화 4차")]
+[assembly: AssemblyVersion("4.0.0.0")]
+#elif TAEHWA_V3
 [assembly: AssemblyTitle("태화기업 업무자동화 3차")]
 [assembly: AssemblyProduct("태화기업 업무자동화 3차")]
 [assembly: AssemblyVersion("3.0.0.0")]
@@ -21,15 +25,23 @@ using System.Windows.Forms;
 
 internal static class Launcher
 {
-#if TAEHWA_V3
+#if TAEHWA_V4
+    private const string Title = "태화기업 업무자동화 4차";
+    private const string Site = "http://127.0.0.1:8894/";
+    private const string Mode = " --v4";
+    private const string Edition = "4";
+    private const string DirectoryName = "TaehwaDocumentWorkspaceV4";
+#elif TAEHWA_V3
     private const string Title = "태화기업 업무자동화 3차";
     private const string Site = "http://127.0.0.1:8893/";
     private const string Mode = " --v3";
+    private const string Edition = "3";
     private const string DirectoryName = "TaehwaDocumentWorkspaceV3";
 #else
     private const string Title = "태화기업 문서작업실";
     private const string Site = "http://127.0.0.1:8888/";
     private const string Mode = "";
+    private const string Edition = "";
     private const string DirectoryName = "TaehwaDocumentWorkspace";
 #endif
     private static readonly string DataDirectory = Path.Combine(
@@ -112,7 +124,7 @@ internal static class Launcher
             {
                 string health = reader.ReadToEnd();
                 return health.Contains("\"service\":\"taehwa-document-workspace\"") &&
-                    (Mode.Length == 0 || health.Contains("\"edition\":3"));
+                    (Edition.Length == 0 || health.Contains("\"edition\":" + Edition));
             }
         }
         catch (WebException)

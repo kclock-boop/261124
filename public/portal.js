@@ -26,6 +26,7 @@ for (const card of toolCards) {
   const key = card.dataset.screen;
   jump.add(new Option(card.querySelector("strong").textContent, key));
 }
+if (screens["inventory-csv"]) jump.add(new Option(screens["inventory-csv"][0], "inventory-csv"));
 
 function filterTools() {
   const query = $("tool-query").value.trim().normalize("NFKC").toLocaleLowerCase("ko-KR");
@@ -97,7 +98,7 @@ function navigate(event) {
   const target = location.hash.slice(1);
   const section = target === "tools-guide" ? "programs" : target;
   const key = Object.hasOwn(screens, section) ? section : "home";
-  const [label, route, localScreen] = screens[key];
+  const [label, route, localScreen, localLabel = "내 기존 기록 열기"] = screens[key];
   $("screen-name").textContent = label;
   intro.hidden = Boolean(route);
   syncIntroPlayback();
@@ -127,7 +128,7 @@ function navigate(event) {
       original.textContent = "원본 새 창에서 열기";
       const local = document.createElement("a");
       local.href = "#" + localScreen;
-      local.textContent = "내 기존 기록 열기";
+      local.textContent = localLabel;
       toolbar.append(caption, original, local);
       panel.append(toolbar);
       frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-downloads allow-modals");
